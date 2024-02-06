@@ -1,0 +1,65 @@
+    {% if request.resolver_match.url_name == 'add-lineitem' %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" id="id_lineitem_submit" value="Enter">
+</form>
+        {% endif %}
+        {% if lineitems is not None %}
+        <table id="debit_lineitems">
+        {% for li in lineitems %}
+            {% if forloop.first %}
+            <tr><th>Price</th><th>Quantity</th><th>w/tax</th><th></th><th></th><th></th></tr>
+            {% endif %}
+            {% if updating_lineitem is not None and li.id == updating_lineitem %}
+            <tr class="existing_debit_lineitem">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_table }}
+                <td>
+                <input type="submit" id="id_lineitem_submit" value="Save Changes">
+                <a href="{% url 'add-lineitem' li.customer_purchase.id %}">Cancel</a>
+                </td>
+            </form>
+            </tr>
+            {% else %}
+            <tr class="existing_debit_lineitem">
+                <td>${{ li.price|floatformat:2 }}</td><td>{{ li.quantity }}</td><td>${{ li.total_price|floatformat:2 }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td><td><a class="increment_anchors" href="{% url 'add-lineitem' li.customer_purchase.id li.id %}">+1 to Qty</a></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+        {% endif %}
+        <hr>
+        <p>Subtotal: ${{ subtotal|floatformat:2 }}</p>
+        {% if purchasepayments is not None %}
+        <table id="debit_purchasepayments">
+        {% for li in purchasepayments %}
+            {% if forloop.first %}
+            <tr><th>Amount</th><th>Type</th><th></th></tr>
+            {% endif %}
+            {% if updating_lineitem is not None and li.id == updating_lineitem %}
+            <tr>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_table }}
+                <td>
+                <input type="submit" id="id_lineitem_submit" value="Save Changes">
+                <a href="{% url 'add-lineitem' li.customer_purchase.id %}">Cancel</a>
+                </td>
+            </form>
+            </tr>
+            {% else %}
+            <tr>
+                <td>${{ li.price|floatformat:2 }}</td><td>{{ li.payment_type }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        </table>
+        {% endif %}
+        <hr>
+        {% if remaining is not None %}
+        <p>Remaining: $<span id="remaining" class="not_change">{{ remaining|floatformat:2 }}</span>
+        {% else %}
+        <p>Change: $<span id="remaining" class="change">{{ change|floatformat:2 }}</span>
+        {% endif %}

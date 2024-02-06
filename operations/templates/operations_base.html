@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <script>
+        document.addEventListener("keydown", e => {
+            if(e.key === "+") {
+                e.preventDefault()
+            }
+        })
+        document.addEventListener("keyup", e => {
+            if(e.key === "+") {
+                window.location.href   = "{% url 'customer-purchase-create' %}";               
+            }
+        })
+    </script>
+  {% block headjs %}{% endblock %}
+    <style>
+        form p {
+            display:inline-block
+        }
+        table {
+            width: 100%;
+            table-layout: fixed;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        #fkeys_colgroup col {
+          background: turquoise
+        }
+        .change {
+            background-color: lightgrey;
+            color: green;
+        }
+        .not_change {
+            background-color: lightgrey;
+            color: red;
+        }
+    </style>
+  {% block headcss %}
+  {% endblock %}
+</head>
+<body>
+    <ul class="menu">
+        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+        <li><a href="{% url 'customer-purchase-list'  %}">Past Transactions</a></li>
+        <li><a href="{% url 'customer-purchase-create'  %}">New Transaction</a></li>
+        {% block appmenu %}{% endblock %}
+    </ul>
+    <table id="fkeys" >
+        <colgroup id="fkeys_colgroup">
+        </colgroup>
+        <tr id="fkey_keys"></tr>
+        <tr id="fkey_reminders"></tr>
+    </table>
+    <h1>{% block h1 %}{% endblock %}</h1>
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert">
+            {{ message|safe }}
+        </div>
+        {% endfor %}
+    {% endif %}
+  {% block content %}{% endblock %}
+    <script>
+        var first_input      = document.querySelector('form input:not([type=hidden])')
+        if (first_input !== null) {
+            first_input.focus();
+        }
+        var fk_colgroup      = document.getElementById("fkeys_colgroup");
+        var fk_row           = document.getElementById("fkey_keys");
+        var hint_row         = document.getElementById("fkey_reminders");
+
+        var plus_key         = fk_row.insertCell(-1);
+        plus_key.innerHTML   = "+";
+        var plus_hint        = hint_row.insertCell(-1);
+        plus_hint.innerHTML  = "new transaction";
+        var plus_el          = document.createElement('col');
+        plus_el.setAttribute('class',"twenty");
+        fk_colgroup.appendChild(plus_el);
+
+        var enter_key        = fk_row.insertCell(-1);
+        enter_key.innerHTML  = "Enter";
+        var enter_hint       = hint_row.insertCell(-1);
+        enter_hint.innerHTML = "std tax";
+        var enter_el         = document.createElement('col');
+        enter_el.setAttribute('class',"twenty");
+        fk_colgroup.appendChild(enter_el);
+
+    {% for fk in fkeys %}
+        var x = fk_row.insertCell(-1);
+        x.innerHTML="{{ fk.key }}";
+        var y = hint_row.insertCell(-1);
+        y.innerHTML="{{ fk }}";
+        var newel = document.createElement('col');
+        newel.setAttribute('class',"twenty");
+        fk_colgroup.appendChild(newel);
+    {% endfor %}
+    </script>
+</body>
+</html>

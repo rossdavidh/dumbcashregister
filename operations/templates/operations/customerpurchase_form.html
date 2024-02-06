@@ -1,0 +1,76 @@
+{% extends "operations_base.html" %}
+
+{% block headjs %}
+    <script>
+        document.addEventListener("keydown", e => {
+            if(e.key === "Enter") {
+                e.preventDefault()
+            }
+        })
+        document.addEventListener("keyup", e => {
+            if(e.key === "Enter") {
+                var price_value        = document.getElementById("id_price").value;
+                var nbr_debits         = document.getElementsByClassName("existing_debit_lineitem").length;
+                if (price_value > 0) {
+                    var tax_category_selector    = document.getElementById("id_tax_category");
+                    // the 0th option willl be '-----', so the default
+                    // tax category will be option [1]
+                    var default_tax_category_id  = tax_category_selector.children[1].value;
+                    tax_category_selector.value  = default_tax_category_id;
+                    document.getElementById("id_lineitem_submit").click();
+                } else {
+                    var incr_atags     = document.getElementsByClassName("increment_anchors");
+                    var new_url        = incr_atags[0].getAttribute('href');
+                    window.location.href         = new_url;
+                }
+            }
+        })
+        {% for fk in fkeys %}
+        document.addEventListener("keydown", e => {
+            if(e.key === "{{ fk.key }}") {
+                e.preventDefault()
+            }
+        })
+        document.addEventListener("keyup", e => {
+            if(e.key === "{{ fk.key }}") {
+                var submit   = true;
+                var id_str   = "id_{{ fk.key_type }}"
+                var fk_selector = document.getElementById(id_str);
+                if (id_str == "id_tax_category") {
+                    fk_selector.value  = "{{ fk.tax_category.id }}";
+                }
+                if (id_str == "id_payment_type") {
+                    fk_selector.value  = "{{ fk.payment_type.id }}";
+                    var price          = document.getElementById("id_price");
+                    if (price.value == "") {
+                        var remaining  = document.getElementById("remaining");
+                        var value_remaining      = Number(remaining.innerHTML);
+                        if (Number.isNaN(value_remaining)) {
+                            value_remaining      = 0;
+                        }
+                        var is_change  = remaining.classList.contains("change");
+                        if (is_change) {
+                            alert("Nothing left to pay.");
+                            submit     = false;
+                        }
+                        price.value    = value_remaining;
+                    }
+                }
+                if (id_str == "id_discount_type") {
+                    fk_selector.value = "{{ fk.discount_type.id }}";
+                }
+                if (submit) {
+                    document.getElementById("id_lineitem_submit").click();
+                }
+            }
+        })
+        {% endfor %}
+    </script>
+
+{% endblock %}
+
+{% block content %}
+
+{% include 'operations/lineitems_table.html' %}
+
+{% endblock %}

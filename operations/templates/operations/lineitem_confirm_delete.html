@@ -1,0 +1,16 @@
+{% extends "operations_base.html" %}
+{% block content %}
+
+<form method="post">{% csrf_token %}
+
+{% if object.payment_type is not None %}
+<p>Are you sure you want to delete payment "{{ object.price|floatformat:2 }} ({{ object.payment_type }})"?</p>
+{% else %}
+<p>Are you sure you want to delete item "{{ object.price|floatformat:2 }} qty {{ object.quantity }}({{ object.tax_category }} tax)"?</p>
+{% endif %}
+    <input type="submit" value="Confirm">
+    <a href="{% url 'add-lineitem' object.customer_purchase.id %}">Cancel</a>
+</form>
+
+
+{% endblock %}

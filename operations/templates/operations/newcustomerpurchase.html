@@ -1,0 +1,22 @@
+{% extends "operations_base.html" %}
+
+
+{% block content %}
+
+<form method="POST" enctype="multipart/form-data">
+
+    <!-- Security token -->
+    {% csrf_token %}
+
+    <!-- Using the formset -->
+    {{ form.as_p }}
+
+    <input type="submit" id="new_transaction_submit" value="New Transaction">
+</form>
+
+<script>
+    var submit_button        = document.getElementById("new_transaction_submit").click()
+</script>
+
+
+{% endblock %}

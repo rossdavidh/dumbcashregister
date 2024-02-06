@@ -1,0 +1,11 @@
+{% extends "operations_base.html" %}
+
+{% block content %}
+
+<ul>
+    {% for pp in object_list %}
+    <li>{{ pp.updated_at|date:'Y-m-d H:i' }} <a href="{% url 'add-lineitem' pp.id %}">Edit</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

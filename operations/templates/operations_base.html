@@ -81,22 +81,20 @@
         var plus_el          = document.createElement('col');
         plus_el.setAttribute('class',"twenty");
         fk_colgroup.appendChild(plus_el);
-
+    {% if fkeys %}
         var enter_key        = fk_row.insertCell(-1);
         enter_key.innerHTML  = "Enter";
         var enter_hint       = hint_row.insertCell(-1);
         enter_hint.innerHTML = "std tax";
         var enter_el         = document.createElement('col');
-        enter_el.setAttribute('class',"twenty");
         fk_colgroup.appendChild(enter_el);
-
+    {% endif %}
     {% for fk in fkeys %}
         var x = fk_row.insertCell(-1);
         x.innerHTML="{{ fk.key }}";
         var y = hint_row.insertCell(-1);
-        y.innerHTML="{{ fk }}";
+        y.innerHTML="{{ fk }}".replace("{{ fk.key }}","");
         var newel = document.createElement('col');
-        newel.setAttribute('class',"twenty");
         fk_colgroup.appendChild(newel);
     {% endfor %}
     </script>

@@ -2,6 +2,15 @@
 
 {% block headjs %}
     <script>
+        var decimal_hit      = false;
+        document.addEventListener("keydown", e => {
+            if(e.key === ".") {
+                var price_input        = document.getElementById("id_price");
+                if(document.activeElement === price_input) {
+                    decimal_hit        = true;
+                }
+            }
+        })
         document.addEventListener("keydown", e => {
             if(e.key === "Enter") {
                 e.preventDefault()
@@ -12,8 +21,12 @@
                 var price_value        = document.getElementById("id_price").value;
                 var nbr_debits         = document.getElementsByClassName("existing_debit_lineitem").length;
                 if (price_value > 0) {
+                    if(!decimal_hit) {
+                        document.getElementById("id_price").value    = price_value / 100;
+                        decimal_hit    = false;
+                    }
                     var tax_category_selector    = document.getElementById("id_tax_category");
-                    // the 0th option willl be '-----', so the default
+                    // the 0th option will be '-----', so the default
                     // tax category will be option [1]
                     var default_tax_category_id  = tax_category_selector.children[1].value;
                     tax_category_selector.value  = default_tax_category_id;
@@ -42,6 +55,10 @@
                 if (id_str == "id_payment_type") {
                     fk_selector.value  = "{{ fk.payment_type.id }}";
                     var price          = document.getElementById("id_price");
+                    if(!decimal_hit) {
+                        price.value    = price.value / 100;
+                        decimal_hit    = false;
+                    }
                     if (price.value == "") {
                         var remaining  = document.getElementById("remaining");
                         var value_remaining      = Number(remaining.innerHTML);

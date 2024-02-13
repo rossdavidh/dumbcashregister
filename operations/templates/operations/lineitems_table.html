@@ -24,14 +24,14 @@
             </tr>
             {% else %}
             <tr class="existing_debit_lineitem">
-                <td>${{ li.price|floatformat:2 }}</td><td>{{ li.quantity }}</td><td>${{ li.total_price|floatformat:2 }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td><td><a class="increment_anchors" href="{% url 'add-lineitem' li.customer_purchase.id li.id %}">+1 to Qty</a></td>
+                <td>{{ currency_symbol }}{{ li.price|floatformat:price_floatformat }}</td><td>{{ li.quantity }}</td><td>{{ currency_symbol }}{{ li.total_price|floatformat:price_floatformat }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td><td><a class="increment_anchors" href="{% url 'add-lineitem' li.customer_purchase.id li.id %}">+1 to Qty</a></td>
             </tr>
             {% endif %}
         {% endfor %}
         </table>
         {% endif %}
         <hr>
-        <p>Subtotal: ${{ subtotal|floatformat:2 }}</p>
+        <p>Subtotal: {{ subtotal|floatformat:price_floatformat }}</p>
         {% if purchasepayments is not None %}
         <table id="debit_purchasepayments">
         {% for li in purchasepayments %}
@@ -51,7 +51,7 @@
             </tr>
             {% else %}
             <tr>
-                <td>${{ li.price|floatformat:2 }}</td><td>{{ li.payment_type }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td>
+                <td>{{ li.price|floatformat:price_floatformat }}</td><td>{{ li.payment_type }}</td><td><a href="{% url 'update-lineitem' li.id %}">Edit</a></td><td><a href="{% url 'delete-lineitem' li.id %}">Delete</a></td>
             </tr>
             {% endif %}
         {% endfor %}
@@ -59,7 +59,7 @@
         {% endif %}
         <hr>
         {% if remaining is not None %}
-        <p>Remaining: $<span id="remaining" class="not_change">{{ remaining|floatformat:2 }}</span>
+        <p>Remaining: $<span id="remaining" class="not_change">{{ remaining|floatformat:price_floatformat }}</span>
         {% else %}
-        <p>Change: $<span id="remaining" class="change">{{ change|floatformat:2 }}</span>
+        <p>Change: $<span id="remaining" class="change">{{ change|floatformat:price_floatformat }}</span>
         {% endif %}

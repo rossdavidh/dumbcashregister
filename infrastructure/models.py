@@ -31,6 +31,7 @@ class CRModel(models.Model):
 
 class PaymentType(CRModel):
     name = models.CharField(max_length=200,unique=True)
+    #TODO: remove calculate_change, after verifying it is not needed
     calculate_change         = models.BooleanField(default=False,verbose_name="For this payment method, calculate change returned to customer")
     order          = models.IntegerField()
 

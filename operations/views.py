@@ -7,6 +7,10 @@ from     django.views.generic.list     import    ListView
 from     .models   import    *
 from     infrastructure.models         import    FKey
 
+CURRENCY_SYMBOL    = '$'
+PRICE_STEP_SIZE    = '0.01'
+PRICE_DIVISOR      = 100
+PRICE_FLOATFORMAT  = 2
 
 class CustomerPurchaseList(ListView):
     model          = CustomerPurchase
@@ -31,6 +35,11 @@ class CustomerPurchaseCreate(CreateView):
 
 def fkeys_subtotal_and_remaining(context):
     context['fkeys']         = FKey.objects.all()
+    #TODO: put this into the database somehow; user session/preferences?
+    context['currency_symbol']         = CURRENCY_SYMBOL
+    context['price_step_size']         = PRICE_STEP_SIZE
+    context['price_divisor']           = PRICE_DIVISOR
+    context['price_floatformat']       = PRICE_FLOATFORMAT
     lineitems      = LineItem.objects.filter(customer_purchase=context['customer_purchase']).filter(debit=True)
     context['lineitems']     = lineitems
     context['subtotal']      = 0
@@ -54,7 +63,7 @@ class LineItemForm(forms.ModelForm):
         model      = LineItem
         fields     = ['price','quantity','tax_category','discount_type','payment_type','note']
         widgets = {
-            'price': forms.NumberInput(attrs={'step': 0.01}),
+            'price': forms.NumberInput(attrs={'step': PRICE_STEP_SIZE}),
         }
 
 
@@ -66,7 +75,10 @@ class LineItemCreate(CreateView):
     def form_valid(self, form):
         purch      = CustomerPurchase.objects.get(id=self.kwargs['customer_purchase'])
         form.instance.customer_purchase          = purch
-        return super(LineItemCreate, self).form_valid(form)
+        response   =  super(LineItemCreate, self).form_valid(form)
+        self.object.price    = self.object.price / PRICE_DIVISOR
+        self.object.save()
+        return response
 
     def get_context_data(self, **kwargs):
         context    = super(LineItemCreate, self).get_context_data(**kwargs)

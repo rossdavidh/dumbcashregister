@@ -38,8 +38,10 @@ class CustomerPurchase(CRModel):
             return 0
 
 
+#TODO: do we use this any more?
 def get_default_tax_category():
     return TaxCategory.objects.all()[0].id
+
 
 class LineItem(CRModel):
     customer_purchase        = models.ForeignKey(CustomerPurchase,on_delete=models.CASCADE)
@@ -69,7 +71,8 @@ class LineItem(CRModel):
         ordering   = ["customer_purchase","-created_at"]
 
     def __str__(self):
-        return str(self.customer_purchase) + ", $" + str(round(self.price,2))
+        return str(self.customer_purchase) + ", $" + str(round(self.price,2)) + " x " +str(self.qty)
+
 
     def save(self, *args, **kwargs):
         if self.payment_type:

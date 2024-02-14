@@ -8,5 +8,7 @@ urlpatterns = [
     path("add_lineitem/<str:customer_purchase>/<str:lineitem_increment>/", views.LineItemCreate.as_view(), name="add-lineitem"),
     path("add_lineitem/<str:customer_purchase>/", views.LineItemCreate.as_view(), name="add-lineitem"),
     path("<pk>/edit_lineitem/", views.LineItemUpdate.as_view(), name="update-lineitem"),
-    path('<pk>/delete_lineitem/', views.LineItemDelete.as_view(), name="delete-lineitem"),
+    path("<pk>/delete_lineitem/", views.LineItemDelete.as_view(), name="delete-lineitem"),
+    path("daily_report/<str:the_date>/", views.DailyReport.as_view(), name="daily-report"),
+    path("daily_report/", views.DailyReport.as_view(), name="daily-report"),
 ]

@@ -1,0 +1,70 @@
+{% extends "operations_base.html" %}
+
+{% block content %}
+
+<ul>
+    {% for dt in all_dates %}
+    <li>{{ dt }} <a href="{% url 'daily-report' dt %}">Report</a></li>
+    {% endfor %}
+</ul>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>{{ the_date }}</th>
+            {% for tc in taxcategories %}
+            <th>{{ tc }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>subtotal</th>
+            {% for tc,nbr in subtotal.items %}
+            <td>{{ nbr|floatformat:2 }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>sales tax</th>
+            {% for tc,nbr in salestax.items %}
+            <td>{{ nbr|floatformat:2 }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>total</th>
+            {% for tc,nbr in total.items %}
+            <td>{{ nbr|floatformat:2 }}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+</table>
+
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            {% for pt in payment_types %}
+            <th>{{ pt }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>nbr txns</th>
+            {% for pt,nbr in nbr_txns.items %}
+            <td>{{ nbr }}</td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th>total</th>
+            {% for pt,nbr in payment_type_total.items %}
+            <td>{{ nbr|floatformat:2 }}</td>
+            {% endfor %}
+        </tr>
+    </tbody>
+
+</table>
+
+
+{% endblock %}

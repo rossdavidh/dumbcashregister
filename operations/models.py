@@ -71,8 +71,25 @@ class LineItem(CRModel):
         ordering   = ["customer_purchase","-created_at"]
 
     def __str__(self):
-        return str(self.customer_purchase) + ", $" + str(round(self.price,2)) + " x " +str(self.qty)
+        return str(self.customer_purchase) + ", $" + str(round(self.price,2)) + " x " +str(self.quantity) + " = " + str(self.total_price)
 
+    @property
+    def subtotal(self):
+        # without tax
+        if self.discount_type:
+            disc   = 1 - self.discount_type.discount_rate
+        else:
+            disc   = 1
+        return self.price * self.quantity * disc
+
+    @property
+    def salestax(self):
+        # tax only
+        if self.discount_type:
+            disc   = 1 - self.discount_type.discount_rate
+        else:
+            disc   = 1
+        return self.price * self.quantity * disc * self.tax_category.tax_rate
 
     def save(self, *args, **kwargs):
         if self.payment_type:

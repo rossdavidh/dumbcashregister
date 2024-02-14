@@ -1,8 +1,10 @@
+import   datetime
 from     decimal   import    Decimal
 
 from     django    import    forms
 from     django.views.generic.edit     import    CreateView, UpdateView, DeleteView
 from     django.views.generic.list     import    ListView
+from     django.views.generic.base     import    TemplateView
 
 from     .models   import    *
 from     infrastructure.models         import    FKey
@@ -117,3 +119,38 @@ class LineItemDelete(DeleteView):
     def get_success_url(self):
         return reverse('add-lineitem', kwargs={'customer_purchase': self.object.customer_purchase.id})
 
+class DailyReport(TemplateView):
+    template_name  = 'operations/dailyreports.html'
+
+    def get_context_data(self, **kwargs):
+        context    = super().get_context_data(**kwargs)
+        all_dates  = LineItem.objects.order_by("created_at__date").values_list("created_at__date",flat=True).distinct()
+        all_dates  = [d.strftime("%Y-%m-%d") for d in all_dates]
+        context['all_dates'] = all_dates
+        if "the_date" not in self.kwargs:
+            return context
+        the_date   = datetime.datetime.strptime(self.kwargs['the_date'],"%Y-%m-%d").date()
+        context["taxcategories"]       = []
+        context["subtotal"]  = {}
+        context["salestax"]  = {}
+        context["total"]     = {}
+        for tc in TaxCategory.objects.all():
+            context["taxcategories"].append(tc)
+            context["subtotal"][tc.name]         = 0
+            context["salestax"][tc.name]         = 0
+            context["total"][tc.name]            = 0
+            for li in LineItem.objects.filter(created_at__contains=the_date).filter(tax_category=tc):
+                context["subtotal"][tc.name]    += li.subtotal
+                context["salestax"][tc.name]    += li.salestax
+            context["total"][tc.name]  = context["subtotal"][tc.name] + context["salestax"][tc.name]
+        context["payment_types"]       = []
+        context["nbr_txns"]            = {}
+        context["payment_type_total"]  = {}
+        for pt in PaymentType.objects.all():
+            context["payment_types"].append(pt)
+            context["nbr_txns"][pt.name]         = 0
+            context["payment_type_total"][pt.name]         = 0
+            for li in LineItem.objects.filter(created_at__contains=the_date).filter(payment_type=pt):
+                context["nbr_txns"][pt.name]    += 1
+                context["payment_type_total"][pt.name]    += li.price
+        return context        

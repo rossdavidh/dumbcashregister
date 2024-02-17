@@ -20,6 +20,11 @@ class CustomerPurchaseList(ListView):
     template_name  = 'operations/listcustomerpurchases.html'
     paginate_by    = 100 
 
+    def get_queryset(self, **kwargs):
+       qs          = super().get_queryset(**kwargs)
+       return qs.filter(lineitem__isnull=False).distinct()
+
+
 class CustomerPurchaseCreate(CreateView):
     model          = CustomerPurchase
     fields         = '__all__'

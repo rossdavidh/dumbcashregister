@@ -23,4 +23,5 @@ urlpatterns = [
     path("", views.CustomerPurchaseCreate.as_view(), name="customer-purchase-create"),
     path("operations/", include("operations.urls")),
     path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
 ]

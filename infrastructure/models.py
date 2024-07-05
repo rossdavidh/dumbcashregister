@@ -1,6 +1,13 @@
-from     django.db import    models
-from     django.core.validators        import    MaxValueValidator, MinValueValidator
+from     decimal   import    Decimal
 
+from     django.db import    models
+from     django.dispatch     import receiver
+from     django.core.validators        import    MaxValueValidator, MinValueValidator
+from     django.contrib.auth.models    import    User
+from     django.db.models.signals      import    post_save
+
+DECIMAL_100        = Decimal("100")
+DECIMAL_2          = Decimal("2")
 
 class SoftwareVersion(models.Model):
     version_id     = models.DateField()
@@ -18,15 +25,56 @@ class SoftwareVersion(models.Model):
         return rep
 
 
+class Company(models.Model):
+    company_name   = models.CharField(max_length=200,unique=True)
+    currency_sym   = models.CharField(max_length=4,default="$")
+    price_stepsize = models.CharField(max_length=20,default="0.01")
+    price_divisor  = models.DecimalField(decimal_places=10,
+                                         max_digits=20,
+                                         validators=[
+                                             MinValueValidator(1.0)
+                                         ],
+                                         default=DECIMAL_100)
+    price_format   = models.DecimalField(decimal_places=10,
+                                         max_digits=20,
+                                         validators=[
+                                             MinValueValidator(0.0)
+                                         ],
+                                         default=DECIMAL_2)
+
+    def __str__(self):
+        return self.company_name
+
+    @classmethod
+    def get_default_pk(cls):
+        test, created = cls.objects.get_or_create(
+            company_name="test",
+        )
+        return test.pk
+
+
 class CRModel(models.Model):
     created_at     = models.DateTimeField(auto_now_add=True)
     updated_at     = models.DateTimeField(auto_now=True)
+    company        = models.ForeignKey(Company,on_delete=models.CASCADE,default=Company.get_default_pk)
 
     def software_version_when_created(self):
         return SoftwareVersion.objects.filter(installed_datetime__lte=self.created_at)[0].version_id
 
     def software_version_when_updated(self):
         return SoftwareVersion.objects.filter(installed_datetime__lte=self.updated_at)[0].version_id
+
+
+class UserProfile(CRModel):
+    user = models.OneToOneField(User,on_delete=models.CASCADE, related_name='user_profile')
+
+    def __str__(self):
+        return str(self.user)+" - " + self.company.company_name
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+            UserProfile.objects.create(user=instance).save()
 
 
 class PaymentType(CRModel):

@@ -21,7 +21,9 @@ class CustomerPurchase(CRModel):
         ordering   = ["-created_at"]
 
     def __str__(self):
-        return datetime.datetime.strftime(utc2local(self.created_at),"%Y-%m-%d %H:%M:%S")
+        when       = datetime.datetime.strftime(utc2local(self.created_at),"%Y-%m-%d %H:%M:%S")
+        how_much   = str(self.sum_total()["total_price__sum"])
+        return how_much + " at " + when
 
     def total_payments(self):
         purch_pmts = PurchasePayment.objects.filter(customer_purchase=self)

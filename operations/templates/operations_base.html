@@ -44,6 +44,17 @@
   {% endblock %}
 </head>
 <body>
+    <ul>
+        {% if user.is_authenticated %}
+        <li>{{ user.user_profile.company.company_name }}</li>
+        <li><form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit">Log Out</button>
+          </form></li>
+        {% else %}
+        <li><a href="{% url 'login' %}">Log In</a></li>
+        {% endif %}
+    </ul>
     <ul class="menu">
         <li><a href="{% url 'admin:index' %}">Admin</a></li>
         <li><a href="{% url 'customer-purchase-list'  %}">Past Transactions</a></li>

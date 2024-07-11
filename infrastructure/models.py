@@ -40,7 +40,8 @@ class Company(models.Model):
                                          validators=[
                                              MinValueValidator(0.0)
                                          ],
-                                         default=DECIMAL_2)
+                                         default=DECIMAL_2,
+                                         verbose_name="Price format (how many decimal places to display in prices)")
 
     def __str__(self):
         return self.company_name

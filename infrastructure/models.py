@@ -155,7 +155,7 @@ class FKey(CRModel):
     payment_type   = models.ForeignKey(PaymentType,on_delete=models.CASCADE,null=True,blank=True)
     tax_category   = models.ForeignKey(TaxCategory,on_delete=models.CASCADE,null=True,blank=True)
     discount_type  = models.ForeignKey(DiscountType,on_delete=models.CASCADE,null=True,blank=True)
-    key_type       = models.CharField(max_length=11,choices=KEY_TYPES,null=True,blank=True,editable=False)
+    key_type       = models.CharField(max_length=20,choices=KEY_TYPES,null=True,blank=True,editable=False)
     display_order  = models.IntegerField(default=0,unique=False)
 
     class Meta:
@@ -177,11 +177,11 @@ class FKey(CRModel):
            self.payment_type and self.discount_type:
                raise ValueError("FKey can be only one of payment type, tax category, or discount type")
         elif self.payment_type:
-            self.key_type    = "payment_type"
+            self.key_type    = "PaymentType"
         elif self.tax_category:
-            self.key_type    = "tax_category"
+            self.key_type    = "TaxCategory"
         elif self.discount_type:
-            self.key_type    = "discount_type"
+            self.key_type    = "DiscountType"
         else:
             raise ValueError("FKey must be either a payment type, tax category, or discount type")
         super().save(*args, **kwargs)  # Call the "real" save() method.

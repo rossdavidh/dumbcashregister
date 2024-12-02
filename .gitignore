@@ -1,4 +1,6 @@
+dumbcashregister/settings.py
 *.pyc
 db.sqlite3
 .env
 */__pycache__/*
+*/migrations/*
